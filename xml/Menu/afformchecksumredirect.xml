@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/affredir</path>
+    <page_callback>CRM_Afformchecksumredirect_Checksumredirect::redirect</page_callback>
+    <title>affredir</title>
+    <access_callback>1</access_callback>
+    <is_public>true</is_public>
+    <is_ssl>true</is_ssl>
+  </item>
+</menu>
