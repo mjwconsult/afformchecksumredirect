@@ -6,6 +6,5 @@
     <title>affredir</title>
     <access_callback>1</access_callback>
     <is_public>true</is_public>
-    <is_ssl>true</is_ssl>
   </item>
 </menu>

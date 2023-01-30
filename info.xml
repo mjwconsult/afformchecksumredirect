@@ -2,16 +2,15 @@
 <extension key="afformchecksumredirect" type="module">
   <file>afformchecksumredirect</file>
   <name>afformchecksumredirect</name>
-  <description>FIXME</description>
+  <description>Redirect formbuilder to contribution pages etc. using checksum</description>
   <license>AGPL-3.0</license>
   <maintainer>
     <author>Matthew Wire</author>
     <email>mjw@mjwconsult.co.uk</email>
   </maintainer>
   <urls>
-    <url desc="Main Extension Page">http://FIXME</url>
-    <url desc="Documentation">http://FIXME</url>
-    <url desc="Support">http://FIXME</url>
+    <url desc="Main Extension Page">https://github.com/mjwconsult/afformchecksumredirect</url>
+    <url desc="Support">https://mjw.pt/support/afformchecksumredirect</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
   <releaseDate>2023-01-16</releaseDate>
@@ -20,7 +19,6 @@
   <compatibility>
     <ver>5.57</ver>
   </compatibility>
-  <comments>This is a new, undeveloped module</comments>
   <classloader>
     <psr0 prefix="CRM_" path="."/>
     <psr4 prefix="Civi\" path="Civi"/>

@@ -5,9 +5,7 @@ use Civi\API\Exception\UnauthorizedException;
 class CRM_Afformchecksumredirect_Checksumredirect {
 
   public static function redirect() {
-
     $token = CRM_Utils_Request::retrieveValue('token', 'String', NULL, TRUE, 'GET');
-    $contactID = CRM_Utils_Request::retrieveValue('contact_id', 'Positive', NULL, TRUE, 'GET');
 
     /** @var \Civi\Crypto\CryptoJwt $jwt */
     $jwt = \Civi::service('crypto.jwt');
@@ -44,9 +42,17 @@ class CRM_Afformchecksumredirect_Checksumredirect {
         $quickformSessionTimeout = $quickformSessionTimeout / 60;
 
         $checksum = CRM_Contact_BAO_Contact_Utils::generateChecksum($contactID, NULL, $quickformSessionTimeout);
-        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact', ['id' => 2, 'cs' => $checksum, 'cid' => $contactID]));
+        $queryParams = [
+          'id' => 2, // Contribution Page ID
+          'cs' => $checksum, // Checksum
+          'cid' => $contactID // Contact ID
+        ];
+        if (!empty($afformSubmission['data']['Membership1'][0]['id'])) {
+          // Add the membership ID
+          $queryParams['mid'] = $afformSubmission['data']['Membership1'][0]['id'];
+        }
+        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact', $queryParams));
         break;
-
     }
 
   }
