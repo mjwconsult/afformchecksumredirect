@@ -19,7 +19,7 @@ class CRM_Afformchecksumredirect_Checksumredirect {
       $info = json_decode(json_encode($jwt->decode($token)), TRUE);
     }
     catch (Exception $e) {
-      \Civi::log()->error('Checksumredirect: ' . $e->getMessage() . '; Referrer: ' . $_SERVER['http_referer']);
+      \Civi::log()->error('Checksumredirect: ' . $e->getMessage() . '; Referrer: ' . $_SERVER['HTTP_REFERER']);
       throw new CRM_Core_Exception('invalid redirect');
     }
 
