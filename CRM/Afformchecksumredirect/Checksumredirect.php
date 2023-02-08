@@ -10,8 +10,18 @@ class CRM_Afformchecksumredirect_Checksumredirect {
     /** @var \Civi\Crypto\CryptoJwt $jwt */
     $jwt = \Civi::service('crypto.jwt');
 
-    // Double-decode is needed to convert PHP objects to arrays
-    $info = json_decode(json_encode($jwt->decode($token)), TRUE);
+    /*
+     * Civi\Crypto\Exception\CryptoException: UnexpectedValueException:
+     * Wrong number of segments in afformchecksumredirect/CRM/Afformchecksumredirect/Checksumredirect.php on line 14
+     */
+    try {
+      // Double-decode is needed to convert PHP objects to arrays
+      $info = json_decode(json_encode($jwt->decode($token)), TRUE);
+    }
+    catch (Exception $e) {
+      \Civi::log()->error('Checksumredirect: ' . $e->getMessage() . '; Referrer: ' . $_SERVER['http_referer']);
+      throw new CRM_Core_Exception('invalid redirect');
+    }
 
     if ($info['scope'] !== 'afformPostSubmit') {
       throw new CRM_Core_Exception('invalid redirect');
