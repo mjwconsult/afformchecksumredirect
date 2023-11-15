@@ -42,8 +42,29 @@ class CRM_Afformchecksumredirect_Checksumredirect {
    * @return void
    */
   public static function mapRedirect($afformSubmission) {
-    switch ($afformSubmission['name']) {
-      case 'afformIndividualMembershipApp':
+
+    // Get redirect configuration
+    $configs = preg_split("/\r\n|\n|\r/", \Civi::settings()->get('afformchecksumredirect_redirects'));
+    foreach ($configs as $config) {
+      list($index, $redirectType, $param1) = explode(':', $config);
+      if (empty($redirectType)) {
+        \Civi::log()->error('afformchecksumredirect_redirects is not configured correctly.');
+        continue;
+      }
+      $redirectTypes[$index] = [
+        'type' => $redirectType,
+        'param1' => $param1,
+      ];
+    }
+
+    $csr = CRM_Utils_Request::retrieveValue('csr', 'String', NULL, TRUE, 'GET');
+    if (!is_numeric($csr)) {
+      throw new CRM_Core_Exception('invalid redirect');
+    }
+
+    $csrRedirectType = $redirectTypes[$csr]['type'];
+    switch ($csrRedirectType) {
+      case 'contributionpage':
         if (empty($afformSubmission['data']['Individual1'][0]['id'])) {
           throw new CRM_Core_Exception('invalid redirect');
         }
@@ -53,9 +74,10 @@ class CRM_Afformchecksumredirect_Checksumredirect {
 
         $checksum = CRM_Contact_BAO_Contact_Utils::generateChecksum($contactID, NULL, $quickformSessionTimeout);
         $queryParams = [
-          'id' => 2, // Contribution Page ID
+          'id' => $redirectTypes[$csr]['param1'], // Contribution Page ID
           'cs' => $checksum, // Checksum
-          'cid' => $contactID // Contact ID
+          'cid' => $contactID, // Contact ID
+          //'action' => 'preview',
         ];
         if (!empty($afformSubmission['data']['Membership1'][0]['id'])) {
           // Add the membership ID
@@ -64,7 +86,6 @@ class CRM_Afformchecksumredirect_Checksumredirect {
         CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact', $queryParams));
         break;
     }
-
   }
 
 }
