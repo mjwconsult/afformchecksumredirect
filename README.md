@@ -1,10 +1,10 @@
-# afformchecksumredirect
+# FormBuilder Checksum Redirect
 
-This extension provides a "hack" to allow redirecting a formbuilder form to a quickform using a checksum.
+This extension provides a "hack" to allow redirecting a FormBuilder form to a Quickform (eg. Contribution Page) using a checksum.
 
 The redirect is currently hardcoded in `CRM_Afformchecksumredirect_Checksumredirect::mapRedirect()`.
 
-In formbuilder you must configure the post-submit redirect as follows:
+In FormBuilder you must configure the post-submit redirect as follows:
 
 `civicrm/affredir?csr=0&token=[token]`
 
@@ -21,7 +21,7 @@ Learn more about installing CiviCRM extensions in the [CiviCRM Sysadmin Guide](h
 
 ## Update / Usage
 
-Redirect rules can be configured in Adminster->System Settings->afformchecksumredirect Settings.
+Redirect rules can be configured in Adminster->Customize Data and Screens->FormBuilder Checksum Redirect Settings.
 
 The default is:
 

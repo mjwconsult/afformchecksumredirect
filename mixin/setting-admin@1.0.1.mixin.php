@@ -22,12 +22,24 @@
  *
  *   <civix><setting-page-title>My Custom Title</setting-page-title></civix>
  *
+ * #####################################################################
+ * NOTE: setting-admin@1.0 is a civix-only backport revised for broader compatibility. Differences:
+ *
+ *   - Don't register hooks with the `&` prefix.
+ *   - Don't call `_ts()`. Use `$ts()` trick ourselves.
+ *   - Omit some type-hints.
+ *   - Use separate namespace for EVERY PATCH-VERSION. Prevent conflicts when using polyfill-based loading.
+ *   - Downstream cannot rely on namespace-names/class-names. That's fine. These particular classes are internal helpers.
+ *
+ * The mainline release is setting-admin@1.1+.
+ * #####################################################################
+ *
  * @mixinName setting-admin
- * @mixinVersion 1.0.0
- * @since 5.67
+ * @mixinVersion 1.0.1
+ * @since 5.68
  */
 
-namespace Civi\Mixin\SettingAdminV1;
+namespace Civi\Mixin\SettingAdminV1_0_1;
 
 use Civi;
 
@@ -46,7 +58,7 @@ class About {
   /**
    * @param \CRM_Extension_MixInfo $mixInfo
    */
-  public static function instance(\CRM_Extension_MixInfo $mixInfo): About {
+  public static function instance($mixInfo): About {
     $about = new About();
     $about->mixInfo = $mixInfo;
     $about->info = \CRM_Extension_System::singleton()->getMapper()->keyToInfo($mixInfo->longName);
@@ -62,7 +74,7 @@ class About {
   }
 
   public function getLabel(): string {
-    return $this->info->label ? _ts($this->info->label, ['domain' => $this->info->key]) : $this->info->key;
+    return $this->info->label ? \ts($this->info->label, ['domain' => $this->info->key]) : $this->info->key;
   }
 
   public function getPageTitle(): string {
@@ -82,7 +94,7 @@ class About {
       'page_callback' => 'CRM_Admin_Form_Generic',
       'access_arguments' => [['administer CiviCRM', $this->getPerm()], 'or'],
       'adminGroup' => 'System Settings',
-      'desc' => _ts($this->info->description ?: ''),
+      'desc' => \ts($this->info->description ?: ''),
     ];
   }
 
@@ -137,33 +149,33 @@ class Nav {
 return function ($mixInfo, $bootCache) {
 
   // Register the setting page ("civicrm/admin/setting/{myext}").
-  Civi::dispatcher()->addListener('&hook_civicrm_alterMenu', function (array &$items) use ($mixInfo) {
+  Civi::dispatcher()->addListener('hook_civicrm_alterMenu', function ($e) use ($mixInfo) {
     if (!$mixInfo->isActive()) {
       return;
     }
 
     $about = About::instance($mixInfo);
-    if (!isset($items[$about->getPath()])) {
-      $items[$about->getPath()] = $about->getRoute();
+    if (!isset($e->items[$about->getPath()])) {
+      $e->items[$about->getPath()] = $about->getRoute();
     }
   }, -1000);
 
   // Define a permission "administer {myext}"
-  Civi::dispatcher()->addListener('&hook_civicrm_permission', function (array &$permissions) use ($mixInfo) {
+  Civi::dispatcher()->addListener('hook_civicrm_permission', function ($e) use ($mixInfo) {
     if (!$mixInfo->isActive()) {
       return;
     }
 
     $about = About::instance($mixInfo);
     $perm = 'administer ' . $mixInfo->shortName;
-    if (!isset($permissions[$perm])) {
-      $permissions[$perm] = ts('%1: Administer settings', [1 => $about->getLabel()]);
+    if (!isset($e->permissions[$perm])) {
+      $e->permissions[$perm] = ts('%1: Administer settings', [1 => $about->getLabel()]);
     }
   }, -1000);
 
   // Any settings with "group=={myext}" should be added to our setting page (unless overridden).
   // By default, 'weight' is based on the order-of-declaration (spaced out with increments of 10).
-  Civi::dispatcher()->addListener('&hook_civicrm_alterSettingsMetaData', function(array &$settingsMetaData) use ($mixInfo) {
+  Civi::dispatcher()->addListener('hook_civicrm_alterSettingsMetaData', function($e) use ($mixInfo) {
     if (!$mixInfo->isActive()) {
       return;
     }
@@ -171,7 +183,7 @@ return function ($mixInfo, $bootCache) {
     $weight = 1000;
     $weightInterval = 10;
 
-    foreach ($settingsMetaData as &$setting) {
+    foreach ($e->settingsMetaData as &$setting) {
       if (($setting['group'] ?? '') === $mixInfo->shortName) {
         if (!array_key_exists('settings_pages', $setting)) {
           $setting['settings_pages'][$mixInfo->shortName] = [
@@ -184,7 +196,7 @@ return function ($mixInfo, $bootCache) {
   }, -1000);
 
   // Add navigation-item ('civicrm/admin/setting/{myext}') unless you've already done so.
-  Civi::dispatcher()->addListener('&hook_civicrm_navigationMenu', function (&$menu) use ($mixInfo) {
+  Civi::dispatcher()->addListener('hook_civicrm_navigationMenu', function ($e) use ($mixInfo) {
     if (!$mixInfo->isActive()) {
       return;
     }
@@ -193,7 +205,7 @@ return function ($mixInfo, $bootCache) {
     $newItem = $about->getNavigation() + ['active' => 1];
 
     // Skip if we're already in the menu. (Ignore optional suffix `?reset=1`)
-    $found = Nav::walk($menu, function(&$item) use ($about) {
+    $found = Nav::walk($e->menu, function(&$item) use ($about) {
       if (!isset($item['attributes']['url'])) {
         return NULL;
       }
@@ -203,7 +215,7 @@ return function ($mixInfo, $bootCache) {
       return;
     }
 
-    Nav::walk($menu, function(&$item) use ($newItem) {
+    Nav::walk($e->menu, function(&$item) use ($newItem) {
       if ($item['attributes']['name'] === 'System Settings') {
         $item['child'][] = ['attributes' => $newItem];
         return 'done';
