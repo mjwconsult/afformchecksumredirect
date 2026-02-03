@@ -4,10 +4,13 @@
   <name>FormBuilder Checksum Redirect</name>
   <description>Redirect FormBuilder forms to contribution pages etc. using checksum on submit</description>
   <license>AGPL-3.0</license>
-  <maintainer>
-    <author>Matthew Wire</author>
-    <email>mjw@mjwconsult.co.uk</email>
-  </maintainer>
+  <authors>
+    <author>
+      <name>MJW</name>
+      <email>info@mjwconsult.co.uk</email>
+      <role>Maintainer</role>
+    </author>
+  </authors>
   <urls>
     <url desc="Main Extension Page">https://github.com/mjwconsult/afformchecksumredirect</url>
     <url desc="Support">https://mjw.pt/support/afformchecksumredirect</url>

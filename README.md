@@ -1,17 +1,17 @@
-# FormBuilder Checksum Redirect
+# FormBuilder Redirect
 
-This extension provides a "hack" to allow redirecting a FormBuilder form to a Quickform (eg. Contribution Page) using a checksum.
+This extension allows you to redirect to other Forms or Contribution Pages in the same way as using secret links/checksums.
 
-The redirect is currently hardcoded in `CRM_Afformchecksumredirect_Checksumredirect::mapRedirect()`.
+This means you can give the user a secret link to a form instead of them logging in. They can then submit that form and be redirected
+to another Formbuilder form or a Contribution Page where they will still have the same access as the original secret link.
 
 In FormBuilder you must configure the post-submit redirect as follows:
 
 `civicrm/affredir?csr=0&token=[token]`
 
 such that it contains:
- - csr: A number which tells the redirect which rule to use.
- - token: The JWT token provided by FormBuilder.
-
+- csr: A number which tells the redirect which rule to use.
+- token: The JWT token provided by FormBuilder.
 
 The extension is licensed under [AGPL-3.0](LICENSE.txt).
 
@@ -33,9 +33,17 @@ You could configure additional rules (one per line) eg:
 
 ```
 0:contributionpage:2
-1:contributionpage:5
+1:afform:afformMyDetails
 ```
 
-So if you specified csr=1 then the user would be redirected to contribution page 5.
+So if you specified csr=1 then the user would be redirected to a Form with name `afformMyDetails`.
+If you specified csr=0 then the user would be redirected to Contribution Page 2.
 
-Requires Contact ID / Membership ID from form submission.
+Requires Contact ID from form submission.
+For Contribution pages you can optionally specify Membership ID as well.
+
+## Support and Maintenance
+
+This extension is supported and maintained with the help and support of the CiviCRM community by [MJW](https://www.mjwconsult.co.uk).
+
+We offer paid [support and development](https://mjw.pt/support) as well as a [troubleshooting/investigation service](https://mjw.pt/investigation).

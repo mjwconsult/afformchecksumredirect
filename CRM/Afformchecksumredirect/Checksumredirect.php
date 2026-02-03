@@ -1,6 +1,6 @@
 <?php
 
-use Civi\API\Exception\UnauthorizedException;
+use Civi\Api4\Afform;
 
 class CRM_Afformchecksumredirect_Checksumredirect {
 
@@ -18,7 +18,7 @@ class CRM_Afformchecksumredirect_Checksumredirect {
       // Double-decode is needed to convert PHP objects to arrays
       $info = json_decode(json_encode($jwt->decode($token)), TRUE);
     }
-    catch (Exception $e) {
+    catch (Throwable $e) {
       \Civi::log()->error('Checksumredirect: ' . $e->getMessage() . '; Referrer: ' . $_SERVER['HTTP_REFERER']);
       throw new CRM_Core_Exception('invalid redirect');
     }
@@ -32,21 +32,23 @@ class CRM_Afformchecksumredirect_Checksumredirect {
     }
 
     self::mapRedirect($info['civiAfformSubmission']);
-
-
   }
 
   /**
-   * This function should be split into a hook/configuration or similar
+   * Map the redirection based on configuration / params
+   *
+   * @param $afformSubmission
    *
    * @return void
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   * @throws \Civi\Crypto\Exception\CryptoException
    */
   public static function mapRedirect($afformSubmission) {
-
     // Get redirect configuration
     $configs = preg_split("/\r\n|\n|\r/", \Civi::settings()->get('afformchecksumredirect_redirects'));
     foreach ($configs as $config) {
-      list($index, $redirectType, $param1) = explode(':', $config);
+      [$index, $redirectType, $param1] = explode(':', $config);
       if (empty($redirectType)) {
         \Civi::log()->error('afformchecksumredirect_redirects is not configured correctly.');
         continue;
@@ -88,7 +90,7 @@ class CRM_Afformchecksumredirect_Checksumredirect {
 
       case 'afform':
         $contactID = $afformSubmission['data']['Individual1'][0]['id'];
-        $afform = (array) \Civi\Api4\Afform::get(FALSE)
+        $afform = (array) Afform::get(FALSE)
           ->addWhere('server_route', 'IS NOT EMPTY')
           ->addWhere('name', '=', $redirectTypes[$csr]['param1'])
           ->addSelect('name', 'title', 'server_route', 'is_public')
