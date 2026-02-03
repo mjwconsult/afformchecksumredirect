@@ -1,3 +1,5 @@
+MOVED TO https://lab.civicrm.org/extensions/afformchecksumredirect
+
 # FormBuilder Redirect
 
 This extension allows you to redirect to other Forms or Contribution Pages in the same way as using secret links/checksums.
