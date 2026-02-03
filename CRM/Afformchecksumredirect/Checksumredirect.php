@@ -85,6 +85,19 @@ class CRM_Afformchecksumredirect_Checksumredirect {
         }
         CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact', $queryParams));
         break;
+
+      case 'afform':
+        $contactID = $afformSubmission['data']['Individual1'][0]['id'];
+        $afform = (array) \Civi\Api4\Afform::get(FALSE)
+          ->addWhere('server_route', 'IS NOT EMPTY')
+          ->addWhere('name', '=', $redirectTypes[$csr]['param1'])
+          ->addSelect('name', 'title', 'server_route', 'is_public')
+          ->execute()
+          ->indexBy('name')
+          ->first();
+        $url = \Civi\Afform\Tokens::createUrl($afform, $contactID);
+        CRM_Utils_System::redirect($url);
+        break;
     }
   }
 
